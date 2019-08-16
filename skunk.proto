@@ -1,0 +1,25 @@
+syntax = "proto2";
+
+package skunk;
+
+message function_type {
+ enum Arguments {
+    stringArg1 = 0;
+    fourByteArg1 = 1;
+  }
+
+enum ReturnType {
+    fourByte = 0;
+  }
+    required Arguments args = 1;
+    required ReturnType ret = 2;
+}
+
+message fourByteRet {
+    required int32 ret = 1;
+}
+
+message func_with_1_arg {
+    required string name = 1;
+    required string arg1 = 2;
+}

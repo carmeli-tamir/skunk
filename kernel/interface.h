@@ -1,0 +1,1 @@
+#define CALL_FUNCTION _IOWR(0xEE, 0, char *)

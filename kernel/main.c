@@ -19,6 +19,12 @@ typedef void * (*ptrRetThreeArg)(void *arg1, void *arg2, void *arg3);
 
 extern struct miscdevice skunk_device;
 
+long parse_user_buffer_and_call_function(void *buffer, u32 message_size)
+{
+    pr_info("Got message of size %u", message_size);
+    return 0;
+}
+
 void demo(void)
 {
     unsigned long kalsyms_addr = kallsyms_lookup_name("kallsyms_lookup_name");
