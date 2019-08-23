@@ -5,13 +5,12 @@ import struct
 import skunk_pb2
 
 def binary_length_and_value(buffer, buffer_length):
-    return struct.pack('N', buffer_length) + buffer
+    return struct.pack('I', buffer_length) + buffer
 
 def call_function_demo(device, fname, fargs, fret, arg1):
     func_type = skunk_pb2.function_type()
     func_type.args = fargs
     func_type.ret = fret
-
     func_type_binary = binary_length_and_value(func_type.SerializeToString(), func_type.ByteSize())
 
     func_with_one_arg = skunk_pb2.func_with_1_arg()

@@ -5,6 +5,8 @@
 #include <linux/slab.h>
 #include <linux/miscdevice.h>
 
+#include "skunk.h"
+
 MODULE_LICENSE("GPL");
  
 MODULE_AUTHOR("carmeli.tamir@gmail.com");
@@ -18,12 +20,6 @@ typedef void * (*ptrRetTwoArg)(void *arg1, void *arg2);
 typedef void * (*ptrRetThreeArg)(void *arg1, void *arg2, void *arg3);
 
 extern struct miscdevice skunk_device;
-
-long parse_user_buffer_and_call_function(void *buffer, u32 message_size)
-{
-    pr_info("Got message of size %u", message_size);
-    return 0;
-}
 
 void demo(void)
 {
