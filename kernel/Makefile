@@ -1,6 +1,7 @@
-#TODO: Get all .c files in dir instead of adding one by one
-skunk-objs += main.o skunk_device.o skunk.pb-c.o call_functions.o
-obj-m += skunk.o
+MODULE_NAME := skunk
+
+obj-m := $(MODULE_NAME).o
+$(MODULE_NAME)-objs := $(patsubst %.c, %.o, $(notdir $(wildcard $M/*.c)))
 
 EXTRA_CFLAGS=-I $(PWD)/../third_party/protobuf-c/
 
