@@ -15,8 +15,15 @@ enum ReturnType {
     required ReturnType ret = 2;
 }
 
-message fourByteRet {
-    required int32 ret = 1;
+message ReturnValue {
+  enum CallStatus {
+    Success = 0;
+    FunctionDoesntExist = 1;
+  }
+    required CallStatus status = 1;
+    optional int32 ret32 = 2;
+    optional int64 ret64 = 3;
+    optional string retString = 4;
 }
 
 message func_with_1_arg {

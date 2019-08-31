@@ -15,10 +15,6 @@ MODULE_DESCRIPTION("Module that facilitates kernel function invocation from user
  
 MODULE_VERSION("0.1");
 
-typedef void * (*ptrRetOneArg)(void *arg1);
-typedef void * (*ptrRetTwoArg)(void *arg1, void *arg2);
-typedef void * (*ptrRetThreeArg)(void *arg1, void *arg2, void *arg3);
-
 extern struct miscdevice skunk_device;
 
 void demo(void)
@@ -29,7 +25,7 @@ void demo(void)
     struct path p;
     unsigned long kern_path_addr = kallsyms_lookup_name("kern_path");
     
-    pr_info("Hello kallsysm %p == %p \n", (void*)kalsyms_addr, ((ptrRetOneArg)kalsyms_addr)("kallsyms_lookup_name"));
+    pr_info("Hello kallsysm %p == %p \n", (void*)kalsyms_addr, (void*)((ptrRetOneArg)kalsyms_addr)("kallsyms_lookup_name"));
     pr_info("Hello round jiffies %ld \n", (unsigned long)((ptrRetOneArg)round_jiffies_addr)((void*)133713371337));
     
     mem = kmalloc(sizeof(struct path), GFP_KERNEL);

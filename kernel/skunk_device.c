@@ -9,7 +9,6 @@
 
 static int open_skunk_device(struct inode *inodep, struct file *filep)
 {
-	pr_info("skunk dev: %ld", CALL_FUNCTION);
     return 0;
 }
 
@@ -29,7 +28,6 @@ static long ioctl_skunk_device(struct file *file, unsigned int cmd, unsigned lon
         if (copy_from_user((void *)&message_size, (void*)arg, sizeof(message_size))) {
             return -ENOMEM;
         }
-        pr_info("Got buffer of size %u", message_size);
         message = kmalloc(message_size, GFP_KERNEL);
         if (NULL == message) {
             return -ENOMEM;

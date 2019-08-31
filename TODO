@@ -1,3 +1,10 @@
-1. Parse the messages on the kernel side
-2. Support more arguments
-3. write tests?
+0. Fix repo.sh: Don't insmod modules if they're loaded
+1. Implement return type
+2. Implement parse_proto_and_call_function_fourByteArg1
+3. Implement 2 args function
+4. Write code to auto - generate function calls
+5. write tests?
+
+
+Return: void X u32 X u64 X char* (Return message, each is optional)
+Args: char* X u32 X u64 (Repeated proto. Code arguments in Arguments)

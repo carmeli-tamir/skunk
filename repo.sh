@@ -33,8 +33,23 @@ make_skunk()
     cd ..
 }
 
+is_module_loaded()
+{
+    if lsmod | grep "$1" >> /dev/null ; then
+        echo 1
+    else
+        echo 0
+    fi
+}
+
 load_skunk_kernel_module()
 {
+    res=$(is_module_loaded "skunk")
+    if [[ $res -eq 1 ]]; then
+        echo "skunk.ko is already loaded"
+        return;
+    fi
+
     echo "Loading skunk.ko"
     cd kernel
     sudo insmod skunk.ko
@@ -43,6 +58,12 @@ load_skunk_kernel_module()
 
 load_protoc_kernel_module()
 {
+    res=$(is_module_loaded "protobuf_c")
+    if [[ $res -eq 1 ]]; then
+        echo "protobuf-c.ko is already loaded"
+        return;
+    fi
+
     echo "Loading protobuf-c.ko"
     cd third_party/protobuf-c/protobuf-c/
     sudo insmod protobuf-c.ko
@@ -57,12 +78,12 @@ usage()
 install()
 {
     install_protoc
-    generate_proto
     make_skunk
 }
 
 run()
 {
+    generate_proto
     load_protoc_kernel_module
     load_skunk_kernel_module
 }
