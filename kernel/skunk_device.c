@@ -33,6 +33,7 @@ static long ioctl_skunk_device(struct file *file, unsigned int cmd, unsigned lon
             return -ENOMEM;
         }
         if (copy_from_user(message, ((char*)arg ) + sizeof(message_size), message_size)) {
+            kfree(message);
             return -ENOMEM;
         }
         ret = parse_user_buffer_and_call_function(message, message_size);

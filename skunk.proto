@@ -9,7 +9,7 @@ message function_type {
   }
 
 enum ReturnType {
-    fourByte = 0;
+    eightByte = 0;
   }
     required Arguments args = 1;
     required ReturnType ret = 2;
@@ -19,11 +19,11 @@ message ReturnValue {
   enum CallStatus {
     Success = 0;
     FunctionDoesntExist = 1;
+    BadProtobufMessage = 2;
   }
     required CallStatus status = 1;
-    optional int32 ret32 = 2;
-    optional int64 ret64 = 3;
-    optional string retString = 4;
+    optional int64 ret64 = 2;
+    optional string retString = 3;
 }
 
 message func_with_1_arg {

@@ -1,10 +1,14 @@
-0. Fix repo.sh: Don't insmod modules if they're loaded
-1. Implement return type
+1. Implement return type; Left to return it from the ioctl and parse it in python
 2. Implement parse_proto_and_call_function_fourByteArg1
-3. Implement 2 args function
+3. Remove demo code from main
 4. Write code to auto - generate function calls
-5. write tests?
+5. Improve documentation and open project to the public
+6. Re-write skunk.py as a class
+7. Implement 2 args function
+8. write tests
+9. Enforce clang formatting
+10. Support return values other than 8 bytes
 
 
-Return: void X u32 X u64 X char* (Return message, each is optional)
+Return: void X NUM (32bit / 64bit / ptr) X char* (Return message, each is optional)
 Args: char* X u32 X u64 (Repeated proto. Code arguments in Arguments)

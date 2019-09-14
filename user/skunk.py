@@ -25,7 +25,7 @@ def call_function_demo(device, fname, fargs, fret, arg1):
 
 def run_skunk():
     with open("/dev/skunk", 'r') as skunk_device:
-        call_function_demo(skunk_device, "kallsyms_lookup_name", skunk_pb2.function_type.stringArg1, skunk_pb2.function_type.fourByte, "kallsyms_lookup_name")
+        call_function_demo(skunk_device, "kallsyms_lookup_name", skunk_pb2.function_type.stringArg1, skunk_pb2.function_type.eightByte, "kallsyms_lookup_name")
         
 
 if __name__ == "__main__":
