@@ -27,7 +27,8 @@ static void parse_proto_and_call_function_ret_64_stringArg1(char *buffer, u32 le
     if (0 == func_addr) {
         ret->status = SKUNK__RETURN_VALUE__CALL_STATUS__FunctionDoesntExist;
     }
-    ret->ret64 =(int64_t)((ptrRet64OneArg)func_addr)(func_1arg->arg1);
+    ret->ret64 = (int64_t)((ptrRet64OneArg)func_addr)(func_1arg->arg1);
+    ret->has_ret64 = 1;
 }
 
 static void parse_proto_and_call_function_ret_64_fourByteArg1(char *buffer, u32 length)
@@ -35,14 +36,11 @@ static void parse_proto_and_call_function_ret_64_fourByteArg1(char *buffer, u32 
     pr_info("Hello four byte arg1");
 }
 
-long parse_user_buffer_and_call_function(char *buffer, u32 length)
+long parse_user_buffer_and_call_function(char *buffer, u32 length, Skunk__ReturnValue *ret)
 {
     Skunk__FunctionType *func_type;
-    Skunk__ReturnValue ret;
     u32 message_size;
     u32 offset = 0;
-
-    skunk__return_value__init(&ret);
 
     message_size = *((u32*)buffer);
     offset = sizeof(message_size);
@@ -64,7 +62,7 @@ long parse_user_buffer_and_call_function(char *buffer, u32 length)
     switch (func_type->args)
     {
         case SKUNK__FUNCTION_TYPE__ARGUMENTS__stringArg1:
-            parse_proto_and_call_function_ret_64_stringArg1(buffer + offset + message_size, length - offset, &ret);
+            parse_proto_and_call_function_ret_64_stringArg1(buffer + offset + message_size, length - offset, ret);
         break;
         case SKUNK__FUNCTION_TYPE__ARGUMENTS__fourByteArg1:
             parse_proto_and_call_function_ret_64_fourByteArg1(buffer + offset + message_size, length - offset);
@@ -74,6 +72,5 @@ long parse_user_buffer_and_call_function(char *buffer, u32 length)
     }
     
     skunk__function_type__free_unpacked(func_type, NULL);
-
     return 0;
 }
