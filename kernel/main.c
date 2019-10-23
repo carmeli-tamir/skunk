@@ -25,9 +25,10 @@ void demo(void)
     struct path p;
     unsigned long kern_path_addr = kallsyms_lookup_name("kern_path");
     
-    pr_info("Hello kallsysm %p == %p \n", (void*)kalsyms_addr, (void*)((ptrRetOneArg)kalsyms_addr)("kallsyms_lookup_name"));
-    pr_info("Hello round jiffies %ld \n", (unsigned long)((ptrRetOneArg)round_jiffies_addr)((void*)133713371337));
-    
+    //pr_info("Hello kallsysm %p == %p \n", (void*)kalsyms_addr, (void*)((ptrRetOneArg)kalsyms_addr)("kallsyms_lookup_name"));
+    //pr_info("Hello round jiffies %ld \n", (unsigned long)((ptrRetOneArg)round_jiffies_addr)((void*)133713371337));
+    pr_info("Size is %ld\n",sizeof(unsigned long));
+
     mem = kmalloc(sizeof(struct path), GFP_KERNEL);
     ret = ((ptrRetThreeArg)kern_path_addr)("/etc/shadow", (void*)1 /*LOOKUP_FOLLOW*/, mem);
     memcpy(&p, mem, sizeof(struct path));

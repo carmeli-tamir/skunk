@@ -1,13 +1,12 @@
-1. Implement return type; Left to return it from the ioctl and parse it in python
-2. Implement parse_proto_and_call_function_fourByteArg1
-3. Remove demo code from main
-4. Write code to auto - generate function calls
-5. Improve documentation and open project to the public
-6. Re-write skunk.py as a class
-7. Implement 2 args function
-8. write tests
-9. Enforce clang formatting
-10. Support return values other than 8 bytes
+- Remove demo code from main
+- Write code to auto - generate function calls
+- Improve documentation and open project to the public
+- Reduce permissions for /dev/skunk
+- Re-write skunk.py as a class
+- Implement 2 args function
+- write tests
+- Enforce clang formatting
+- Support return values other than 8 bytes
 
 
 Return: void X NUM (32bit / 64bit / ptr) X char* (Return message, each is optional)
