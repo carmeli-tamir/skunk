@@ -4,8 +4,8 @@ package skunk;
 
 message function_type {
  enum Arguments {
-    stringArg1 = 0;
-    fourByteArg1 = 1;
+    oneArg = 0;
+    twoArg = 1;
   }
 
 enum ReturnType {
@@ -13,6 +13,18 @@ enum ReturnType {
   }
     required Arguments args = 1;
     required ReturnType ret = 2;
+}
+
+message Argument {
+   enum ArgumentType {
+    eightByteArg = 0;
+    stringArg = 1;
+  }
+
+  required ArgumentType type = 1;
+
+  optional int64 argInt8b = 2;
+  optional string argString = 3;
 }
 
 message ReturnValue {
@@ -28,5 +40,5 @@ message ReturnValue {
 
 message func_with_1_arg {
     required string name = 1;
-    required string arg1 = 2;
+    required Argument arg1 = 2;
 }
