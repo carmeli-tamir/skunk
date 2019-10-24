@@ -1,5 +1,5 @@
-- Remove demo code from main
 - Write code to auto - generate function calls
+- Make travis ci
 - Improve documentation and open project to the public
 - Reduce permissions for /dev/skunk
 - Re-write skunk.py as a class

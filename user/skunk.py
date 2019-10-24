@@ -50,7 +50,8 @@ def run_skunk():
         ret = call_function_one_arg(skunk_device, "round_jiffies",
         skunk_pb2.function_type.oneArg, skunk_pb2.function_type.eightByte,
         133713371337, skunk_pb2.Argument.eightByteArg)
-        print("Got result of {}".format(ret.ret64)) # Printing 2's complement of the address
+
+        print("Got result of {}".format(ret.ret64))
 
 if __name__ == "__main__":
     run_skunk()

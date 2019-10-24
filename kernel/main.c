@@ -1,11 +1,7 @@
 #include <linux/module.h>     /* Needed by all modules */
-#include <linux/kernel.h>     /* Needed for KERN_INFO */
 #include <linux/init.h>       /* Needed for the macros */
-#include <linux/kallsyms.h>
-#include <linux/slab.h>
 #include <linux/miscdevice.h>
 
-#include "skunk.h"
 
 MODULE_LICENSE("GPL");
  
@@ -17,29 +13,8 @@ MODULE_VERSION("0.1");
 
 extern struct miscdevice skunk_device;
 
-void demo(void)
-{
-    unsigned long kalsyms_addr = kallsyms_lookup_name("kallsyms_lookup_name");
-    unsigned long round_jiffies_addr = kallsyms_lookup_name("round_jiffies");
-    void *mem, *ret;
-    struct path p;
-    unsigned long kern_path_addr = kallsyms_lookup_name("kern_path");
-    
-    //pr_info("Hello kallsysm %p == %p \n", (void*)kalsyms_addr, (void*)((ptrRetOneArg)kalsyms_addr)("kallsyms_lookup_name"));
-    //pr_info("Hello round jiffies %ld \n", (unsigned long)((ptrRetOneArg)round_jiffies_addr)((void*)133713371337));
-    pr_info("Size is %ld\n",sizeof(unsigned long));
-
-    mem = kmalloc(sizeof(struct path), GFP_KERNEL);
-    ret = ((ptrRetThreeArg)kern_path_addr)("/etc/shadow", (void*)1 /*LOOKUP_FOLLOW*/, mem);
-    memcpy(&p, mem, sizeof(struct path));
-    pr_info("Hello kern_path %ld, %s \n", (unsigned long)ret, p.dentry->d_iname);
-    kfree(mem);
-    
-}
-
 static int __init skunk_init(void)
 {
-    demo();
     return misc_register(&skunk_device);
 }
  

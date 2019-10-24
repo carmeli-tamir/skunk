@@ -7,10 +7,6 @@
 
 #define SKUNK_DEVICE "skunk"
 
-typedef void * (*ptrRetOneArg)(void *arg1);
-typedef void * (*ptrRetTwoArg)(void *arg1, void *arg2);
-typedef void * (*ptrRetThreeArg)(void *arg1, void *arg2, void *arg3);
-
 typedef u64 (*ptrRet64StrArg)(char *arg1);
 typedef u64 (*ptrRet64Int8bArg)(u64 arg1);
 
