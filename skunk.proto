@@ -2,19 +2,6 @@ syntax = "proto2";
 
 package skunk;
 
-message function_type {
- enum Arguments {
-    oneArg = 0;
-    twoArg = 1;
-  }
-
-enum ReturnType {
-    eightByte = 0;
-  }
-    required Arguments args = 1;
-    required ReturnType ret = 2;
-}
-
 message Argument {
    enum ArgumentType {
     eightByteArg = 0;
@@ -38,7 +25,14 @@ message ReturnValue {
     optional string retString = 3;
 }
 
-message func_with_1_arg {
-    required string name = 1;
-    required Argument arg1 = 2;
+message FunctionCall {
+    enum ReturnType {
+      eightByte = 0;
+    }
+    required ReturnType returnType = 1;
+
+    required string name = 2;
+    required uint32 numberOfArguments = 3;
+    optional Argument arg1 = 4;
+    optional Argument arg2 = 5;
 }

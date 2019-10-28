@@ -1,11 +1,14 @@
 - Write code to auto - generate function calls
+    Complete drawing
+    Write code that implements the ID
+    Write code that implements the switch
 - Make travis ci
 - Improve documentation and open project to the public
 - Reduce permissions for /dev/skunk
 - Re-write skunk.py as a class
 - Implement 2 args function
 - write tests
-- Enforce clang formatting
+- Enforce PEP8, sparse, checkpatch and coccinelle
 - Support return values other than 8 bytes
 
 
