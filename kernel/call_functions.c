@@ -5,37 +5,23 @@
 
 #include "skunk.pb-c.h"
 
-static void parse_proto_and_call_function_ret_64_oneArg(char *buffer, u32 length, Skunk__ReturnValue *ret)
+static void parse_proto_and_call_function_ret_64_oneArg(char *name, Skunk__Argument * arg1, Skunk__ReturnValue *ret)
 {
-    Skunk__FuncWith1Arg *func_1arg;
-    u32 message_size;
-    u32 offset = 0;
     unsigned long func_addr;
 
-    message_size = *((u32*)buffer);
-    offset = sizeof(message_size);
-    if (message_size < 0 || message_size > length - offset) {
-        ret->status = SKUNK__RETURN_VALUE__CALL_STATUS__BadProtobufMessage;
-    }
-
-    func_1arg = skunk__func_with_1_arg__unpack(NULL, message_size, buffer + sizeof(message_size));
-    if (NULL == func_1arg) {
-        ret->status = SKUNK__RETURN_VALUE__CALL_STATUS__BadProtobufMessage;
-    }
-
-    func_addr = kallsyms_lookup_name(func_1arg->name);
+    func_addr = kallsyms_lookup_name(name);
     if (0 == func_addr) {
         ret->status = SKUNK__RETURN_VALUE__CALL_STATUS__FunctionDoesntExist;
     }
 
-    switch (func_1arg->arg1->type)
+    switch (arg1->type)
     {
     case SKUNK__ARGUMENT__ARGUMENT_TYPE__stringArg:
-        ret->ret64 = (int64_t)((ptrRet64StrArg)func_addr)(func_1arg->arg1->argstring);
+        ret->ret64 = (int64_t)((ptrRet64StrArg)func_addr)(arg1->argstring);
         break;
 
     case SKUNK__ARGUMENT__ARGUMENT_TYPE__eightByteArg:
-        ret->ret64 = (int64_t)((ptrRet64Int8bArg)func_addr)(func_1arg->arg1->argint8b);
+        ret->ret64 = (int64_t)((ptrRet64Int8bArg)func_addr)(arg1->argint8b);
         break;
 
     default:
@@ -45,46 +31,38 @@ static void parse_proto_and_call_function_ret_64_oneArg(char *buffer, u32 length
     ret->has_ret64 = 1;
 }
 
-static void parse_proto_and_call_function_ret_64_twoArg(char *buffer, u32 length)
+static void parse_proto_and_call_function_ret_64_twoArg(char *name, Skunk__Argument * arg1, Skunk__Argument * arg2, Skunk__ReturnValue *ret)
 {
-    pr_info("Hello four byte arg1");
+    pr_info("Hello Function two args");
 }
 
 long parse_user_buffer_and_call_function(char *buffer, u32 length, Skunk__ReturnValue *ret)
 {
-    Skunk__FunctionType *func_type;
-    u32 message_size;
-    u32 offset = 0;
+    Skunk__FunctionCall *func_call;
 
-    message_size = *((u32*)buffer);
-    offset = sizeof(message_size);
-    if (message_size < 0 || message_size > length - offset) {
-        return message_size;
-    }
-
-    func_type = skunk__function_type__unpack(NULL, message_size, buffer + sizeof(message_size));
-    if (NULL == func_type) {
+    func_call = skunk__function_call__unpack(NULL, length, buffer);
+    if (NULL == func_call) {
         return -EINVAL;
     }
     
-    if (func_type->ret != SKUNK__FUNCTION_TYPE__RETURN_TYPE__eightByte) {
+    if (func_call->returntype != SKUNK__FUNCTION_CALL__RETURN_TYPE__eightByte) {
         pr_info("Currently supporting only 8 bytes return value");
-        skunk__function_type__free_unpacked(func_type, NULL);
+        skunk__function_call__free_unpacked(func_call, NULL);
         return -EINVAL;
     }
 
-    switch (func_type->args)
+    switch (func_call->numberofarguments)
     {
-        case SKUNK__FUNCTION_TYPE__ARGUMENTS__oneArg:
-            parse_proto_and_call_function_ret_64_oneArg(buffer + offset + message_size, length - offset, ret);
+        case 1:
+            parse_proto_and_call_function_ret_64_oneArg(func_call->name, func_call->arg1, ret);
         break;
-        case SKUNK__FUNCTION_TYPE__ARGUMENTS__twoArg:
-            parse_proto_and_call_function_ret_64_twoArg(buffer + offset + message_size, length - offset);
+        case 2:
+            parse_proto_and_call_function_ret_64_twoArg(func_call->name, func_call->arg1, func_call->arg2, ret);
         break;
     default:
         break;
     }
     
-    skunk__function_type__free_unpacked(func_type, NULL);
+    skunk__function_call__free_unpacked(func_call, NULL);
     return 0;
 }
