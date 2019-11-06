@@ -70,6 +70,12 @@ load_protoc_kernel_module()
     cd ../../../
 }
 
+pip_install()
+{
+    res=$(which pip)
+    sudo $res install -e user
+}
+
 usage()
 {
     echo "usage: $0 [[[-i|--install] [-r|--run]] | [-h|--help]]"
@@ -77,6 +83,7 @@ usage()
 
 install()
 {
+    pip_install
     install_protoc
     make_skunk
 }

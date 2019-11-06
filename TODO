@@ -1,16 +1,8 @@
-- Write code to auto - generate function calls
-    Complete drawing
-    Write code that implements the ID
-    Write code that implements the switch
 - Make travis ci
 - Improve documentation and open project to the public
 - Reduce permissions for /dev/skunk
 - Re-write skunk.py as a class
-- Implement 2 args function
+- Generate parts of skunk.h automatically
 - write tests
 - Enforce PEP8, sparse, checkpatch and coccinelle
 - Support return values other than 8 bytes
-
-
-Return: void X NUM (32bit / 64bit / ptr) X char* (Return message, each is optional)
-Args: char* X u32 X u64 (Repeated proto. Code arguments in Arguments)

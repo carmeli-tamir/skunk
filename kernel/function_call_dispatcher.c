@@ -31,60 +31,42 @@ u32 function_call_id(Skunk__FunctionCall__ReturnType ret, u8 numOfArguments,
     return id;
 }
 
-static void call_function_oneArg(char *name, Skunk__FunctionCall__ReturnType ret_type,
-                                Skunk__Argument * arg1, Skunk__ReturnValue *ret)
-{
-    unsigned long func_addr;
-
-    func_addr = kallsyms_lookup_name(name);
-    if (0 == func_addr) {
-        ret->status = SKUNK__RETURN_VALUE__CALL_STATUS__FunctionDoesntExist;
-    }
-
-    switch (function_call_id(ret_type, 1, arg1->type, 0, 0, 0, 0, 0, 0))
-    {
-    case 0x01000000:
-        ret->ret64 = (int64_t)((ptrRet64StrArg)func_addr)(arg1->argstring);
-        break;
-
-    case 0x00000000:
-        ret->ret64 = (int64_t)((ptrRet64Int8bArg)func_addr)(arg1->argint8b);
-        break;
-
-    default:
-        break;
-    }
-
-    ret->has_ret64 = 1;
-}
-
-static void call_function_twoArg(char *name, Skunk__FunctionCall__ReturnType ret_type,
-                                Skunk__Argument * arg1, Skunk__Argument * arg2, Skunk__ReturnValue *ret)
-{
-    pr_info("Hello Function two args");
-}
-
-long parse_user_buffer_and_call_function(char *buffer, u32 length, Skunk__ReturnValue *ret)
+long parse_user_buffer_and_call_function(char *buffer, u32 *length)
 {
     Skunk__FunctionCall *func_call;
+    Skunk__ReturnValue skunk_ret;
+    u32 ret_message_size;
+    long ret = 0;
 
-    func_call = skunk__function_call__unpack(NULL, length, buffer);
+    func_call = skunk__function_call__unpack(NULL, *length, buffer);
     if (NULL == func_call) {
         return -EINVAL;
     }
 
+    skunk__return_value__init(&skunk_ret);
+
     switch (func_call->numberofarguments)
     {
         case 1:
-            call_function_oneArg(func_call->name, func_call->returntype, func_call->arg1, ret);
+            call_function_1Arg(func_call->name, func_call->returntype, func_call->arg1, &skunk_ret);
         break;
         case 2:
-            call_function_twoArg(func_call->name, func_call->returntype, func_call->arg1, func_call->arg2, ret);
+            call_function_2Arg(func_call->name, func_call->returntype, func_call->arg1, func_call->arg2, &skunk_ret);
         break;
     default:
         break;
     }
-    
+    // Return must be packed before freeing func_call, since a memory in ret can point to arguments in func_call.
+    ret_message_size = skunk__return_value__get_packed_size(&skunk_ret);
+    if (ret_message_size > *length) {
+        pr_info("Buffer is too small");
+        ret = -ENOMEM;
+        goto out;
+    }
+    *length = ret_message_size;
+    skunk__return_value__pack(&skunk_ret, buffer);
+
+ out:   
     skunk__function_call__free_unpacked(func_call, NULL);
-    return 0;
+    return ret;
 }
