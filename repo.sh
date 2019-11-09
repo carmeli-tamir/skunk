@@ -85,12 +85,12 @@ install()
 {
     pip_install
     install_protoc
+    generate_proto
     make_skunk
 }
 
 run()
 {
-    generate_proto
     load_protoc_kernel_module
     load_skunk_kernel_module
 }
@@ -111,6 +111,8 @@ while [ "$1" != "" ]; do
                                 ;;
         -r | --run )            run=1
                                 ;;
+        -p | --proto )          proto=1
+                                ;;
         -h | --help )           usage
                                 exit
                                 ;;
@@ -126,4 +128,8 @@ fi
 
 if [ "$run" = "1" ]; then
     run
+fi
+
+if [ "$proto" = "1" ]; then
+    generate_proto
 fi
