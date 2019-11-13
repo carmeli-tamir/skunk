@@ -14,11 +14,21 @@ install_protoc_kernel_module()
     cd ..
 }
 
+install_protobuf()
+{
+    echo "Installing Protobuf"
+    cd third_party/protobuf
+    ./autogen.sh && ./configure --prefix=/usr/local && make && sudo make prefix=/usr/local install
+    sudo ldconfig
+    cd ../..
+
+}
+
 install_protoc()
 {
     echo "Installing protobuf-c"
     cd third_party/protobuf-c
-    ./autogen.sh && ./configure && make && sudo make install
+    ./autogen.sh && ./configure --disable-protoc && make && sudo make install
 
     install_protoc_kernel_module
 
@@ -84,6 +94,7 @@ usage()
 install()
 {
     pip_install
+    install_protobuf
     install_protoc
     generate_proto
     make_skunk

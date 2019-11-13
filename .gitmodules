@@ -2,3 +2,6 @@
 	path = third_party/protobuf-c
 	url = https://github.com/carmeli-tamir/protobuf-c.git
 	branch = protobuf2kernel
+[submodule "third_party/protobuf"]
+	path = third_party/protobuf
+	url = https://github.com/protocolbuffers/protobuf.git
