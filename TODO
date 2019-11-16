@@ -1,8 +1,12 @@
 - Make travis ci
+    - Check the kernel compiles using https://github.com/ZeekHuge/BeagleScope/blob/port_to_4.4.12-ti-r31%2B/.travis.yml
+        - TODO: commit the changes to repo.sh and .gitmodules and recheck the build https://travis-ci.com/carmeli-tamir/skunk/builds/135796888
+    - Check the python code works
 - Improve documentation and open project to the public
 - Reduce permissions for /dev/skunk
 - Re-write skunk.py as a class
 - Generate parts of skunk.h automatically
 - write tests
+- Travis: Support more kernel versions
 - Enforce PEP8, sparse, checkpatch and coccinelle
 - Support return values other than 8 bytes

@@ -1,10 +1,27 @@
 language: python
 
+cache:
+  directories:
+  - $TRAVIS_BUILD_DIR/third_party/protobuf
+  - $TRAVIS_BUILD_DIR/third_party/protobuf-c
+
 os:
   - linux
 
 python:
   - "3.6"
 
+before_install:
+  - export DST_PROJECT=$PWD
+  - export LINUX_VERSION="linux-4.19.84"
+  - export KDIR=$PWD/$LINUX_VERSION
+  - wget "https://cdn.kernel.org/pub/linux/kernel/v4.x/$LINUX_VERSION.tar.xz"
+  - tar -xJf $LINUX_VERSION.tar.xz
+  - cd $LINUX_VERSION
+  - make mrproper
+  - make defconfig
+  - make -j3 modules 2>&1
+
 install:
-  - ./repo.sh -i
+  - cd $DST_PROJECT
+  - source repo.sh -i

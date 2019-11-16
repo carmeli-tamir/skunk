@@ -5,9 +5,11 @@ $(MODULE_NAME)-objs := $(patsubst %.c, %.o, $(notdir $(wildcard $M/*.c)))
 
 EXTRA_CFLAGS=-I $(PWD)/../third_party/protobuf-c/
 
+KDIR?=/lib/modules/$(shell uname -r)/build
+
 all:
 	python generate_function_calls.py
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
+	make -C $(KDIR) M=$(PWD) modules
 
 clean:
-	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+	make -C $(KDIR) M=$(PWD) clean
