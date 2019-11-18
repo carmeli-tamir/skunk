@@ -28,7 +28,7 @@ install_protoc()
 {
     echo "Installing protobuf-c"
     cd third_party/protobuf-c
-    ./autogen.sh && ./configure --disable-protoc && make && sudo make install
+    ./autogen.sh && ./configure && make && sudo make install
 
     install_protoc_kernel_module
 
