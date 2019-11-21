@@ -25,3 +25,6 @@ before_install:
 install:
   - cd $DST_PROJECT
   - source repo.sh -i
+
+script:
+  - echo "Succesfully compiled skunk.ko"
