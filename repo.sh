@@ -14,6 +14,16 @@ install_protoc_kernel_module()
     cd ..
 }
 
+install_protobuf()
+{
+    echo "Installing Protobuf"
+    cd third_party/protobuf
+    ./autogen.sh && ./configure --prefix=/usr/local && make && sudo make prefix=/usr/local install
+    sudo ldconfig
+    cd ../..
+
+}
+
 install_protoc()
 {
     echo "Installing protobuf-c"
@@ -84,13 +94,14 @@ usage()
 install()
 {
     pip_install
+    install_protobuf
     install_protoc
+    generate_proto
     make_skunk
 }
 
 run()
 {
-    generate_proto
     load_protoc_kernel_module
     load_skunk_kernel_module
 }
@@ -111,6 +122,8 @@ while [ "$1" != "" ]; do
                                 ;;
         -r | --run )            run=1
                                 ;;
+        -p | --proto )          proto=1
+                                ;;
         -h | --help )           usage
                                 exit
                                 ;;
@@ -126,4 +139,8 @@ fi
 
 if [ "$run" = "1" ]; then
     run
+fi
+
+if [ "$proto" = "1" ]; then
+    generate_proto
 fi
