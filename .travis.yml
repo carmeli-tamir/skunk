@@ -12,6 +12,7 @@ python:
   - "3.6"
 
 before_install:
+  - sudo apt-get -y install python3-pytest
   - export DST_PROJECT=$PWD
   - export LINUX_VERSION="linux-4.19.84"
   - export KDIR=$PWD/$LINUX_VERSION
@@ -27,4 +28,5 @@ install:
   - source repo.sh -i
 
 script:
-  - echo "Succesfully compiled skunk.ko"
+  - cd user/test
+  - pytest -v

@@ -48,7 +48,6 @@ def run_skunk():
         ret = call_function_two_arg(skunk_device, "kallsyms_lookup_name",
         1, skunk_pb2.FunctionCall.eight_byte,
         "kallsyms_lookup_name", skunk_pb2.Argument.string)
-
         print("Got adress of {}".format(hex(2**64 + ret.eight_byte))) # Printing 2's complement of the address
 
         ret = call_function_two_arg(skunk_device, "round_jiffies",
