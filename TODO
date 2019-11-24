@@ -1,7 +1,7 @@
-- Make travis ci
-    - Implement tests for all 3 cases
-    - combine tests and setup?
 - Improve documentation and open project to the public
+    - Readme structure
+    - Readme how to set up
+    - list of issues
 - Reduce permissions for /dev/skunk
 - Re-write skunk.py as a class
 - Generate parts of skunk.h automatically

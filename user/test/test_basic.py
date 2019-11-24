@@ -1,12 +1,17 @@
 import unittest
+from unittest import mock
 from unittest.mock import patch
 
-import skunk
+from skunk import Skunk
 import skunk_pb2
 
 
 class TestCalls(unittest.TestCase):
     
+    @classmethod
+    def setup_class(cls):
+        cls.skunk = Skunk("/dev/null")
+
     @staticmethod
     def build_return_value(status, eight_byte=None, string=None):
         ret = skunk_pb2.ReturnValue()
@@ -19,7 +24,7 @@ class TestCalls(unittest.TestCase):
         else:
             ret.has_string = False
 
-        return skunk.binary_length_and_value(ret.SerializeToString(), ret.ByteSize())
+        return Skunk._binary_length_and_value(ret.SerializeToString(), ret.ByteSize())
 
     @staticmethod
     def assign_arg(protobuf_arg, arg_type, arg_value):
@@ -44,15 +49,14 @@ class TestCalls(unittest.TestCase):
         if len(args) > 2:
             TestCalls.assign_arg(func_with_one_arg.arg2, args[2], args[3])
 
-        return skunk.binary_length_and_value(func_with_one_arg.SerializeToString(), func_with_one_arg.ByteSize())
+        return Skunk._binary_length_and_value(func_with_one_arg.SerializeToString(), func_with_one_arg.ByteSize())
 
     @patch('skunk.fcntl')
     def test_call_kallsyms(self, mock_requests):
         ioctl_ret = self.build_return_value(skunk_pb2.ReturnValue.Success, 0x1ee7, None)
         mock_requests.ioctl.return_value = ioctl_ret
 
-        ret = skunk.call_function_two_arg(
-            None,
+        ret = TestCalls.skunk.call_function_two_arg(
             "kallsyms_lookup_name",
             1,
             skunk_pb2.FunctionCall.eight_byte,
@@ -61,8 +65,8 @@ class TestCalls(unittest.TestCase):
         )
 
         mock_requests.ioctl.assert_called_once_with(
-                None,
-                0xc008ee00, 
+                mock.ANY,
+                mock.ANY, 
                 self.build_function_call(skunk_pb2.FunctionCall.eight_byte, "kallsyms_lookup_name", skunk_pb2.Argument.string,  "kallsyms_lookup_name")
             )
         assert ret.eight_byte == 0x1ee7
@@ -72,8 +76,7 @@ class TestCalls(unittest.TestCase):
         ioctl_ret = self.build_return_value(skunk_pb2.ReturnValue.Success, 133713371500, None)
         mock_requests.ioctl.return_value = ioctl_ret
 
-        ret = skunk.call_function_two_arg(
-            None,
+        ret = TestCalls.skunk.call_function_two_arg(
             "round_jiffies",
             1,
             skunk_pb2.FunctionCall.eight_byte,
@@ -82,8 +85,8 @@ class TestCalls(unittest.TestCase):
         )
 
         mock_requests.ioctl.assert_called_once_with(
-                None,
-                0xc008ee00, 
+                mock.ANY,
+                mock.ANY, 
                 self.build_function_call(skunk_pb2.FunctionCall.eight_byte, "round_jiffies", skunk_pb2.Argument.eight_byte,  133713371337)
             )
         assert ret.eight_byte == 133713371500
@@ -93,8 +96,7 @@ class TestCalls(unittest.TestCase):
         ioctl_ret = self.build_return_value(skunk_pb2.ReturnValue.Success, None, "ningoflife")
         mock_requests.ioctl.return_value = ioctl_ret
 
-        ret = skunk.call_function_two_arg(
-            None,
+        ret = TestCalls.skunk.call_function_two_arg(
             "strstr",
             2,
             skunk_pb2.FunctionCall.string,
@@ -105,8 +107,8 @@ class TestCalls(unittest.TestCase):
         )
 
         mock_requests.ioctl.assert_called_once_with(
-                None,
-                0xc008ee00, 
+                mock.ANY,
+                mock.ANY, 
                 self.build_function_call(skunk_pb2.FunctionCall.string, "strstr", skunk_pb2.Argument.string,  "whatisthemeaningoflife", skunk_pb2.Argument.string,  "ning")
             )
         assert ret.string == "ningoflife"
