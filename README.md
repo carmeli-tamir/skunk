@@ -2,11 +2,40 @@
 
 ## Overview
 
-This is `protobuf-c`, a C implementation of the [Google Protocol Buffers](https://developers.google.com/protocol-buffers/) data serialization format. It includes `libprotobuf-c`, a pure C library that implements protobuf encoding and decoding, and `protoc-c`, a code generator that converts Protocol Buffer `.proto` files to C descriptor code, based on the original `protoc`. `protobuf-c` formerly included an RPC implementation; that code has been split out into the [protobuf-c-rpc](https://github.com/protobuf-c/protobuf-c-rpc) project.
+`Skunk` is a framework that enables to test linux kernel functions in user space, using python.
+Current kernel testing solutions either require to write kernel code (for Unit Test solutions such as Kunit and KTF) 
+or perform end to end tests (such as Kselftest, Linux Test Project, Kernel CI, Syzbot).
 
-`protobuf-c` was originally written by Dave Benson and maintained by him through version 0.15 but is now being maintained by a new team. Thanks, Dave!
+Since writing kernel code takes time and experience to do well, `Skunk` facilitates
+writing unit test (i.e. testing kernel functions) or integration tests (e.g. testing a kernel subsystem or driver)
+by writing python code in user mode.
 
-## Mailing list
+A simple example of `Skunk`'s usage is testing the kernel implementation of strstr.
+Here's a python code for a simple test:
+
+```
+sk = Skunk()
+ret = sk.call_function_two_arg(
+                                "strstr",                                               # Function name
+                                2,                                                      # Number of arguments
+                                skunk_pb2.FunctionCall.string,                          # Type of return value
+                                "whatisthemeaningoflife", skunk_pb2.Argument.string,    # First argument value and type
+                                "ning", skunk_pb2.Argument.string)                      # Second argument value and type
+
+assert ret.string=="ningoflife", "error"
+```
+
+Currently, you can only test functions with limited dependencies. In the next milestone of `Skunk`, we intend to enable to mock kernel functions
+so that you can extend your test coverage and flexibility.
+
+## Architecture
+    .---------------.----------------.
+    | CGI interface | REST interface |
+    |---------------|----------------.
+    | Query command | Update command |
+    |---------------|----------------|
+    |          Shell script          |
+    '--------------------------------'
 
 ## Setup
 
