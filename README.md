@@ -25,17 +25,17 @@ ret = sk.call_function_two_arg(
 assert ret.string=="ningoflife", "error"
 ```
 
-Currently, you can only test functions with limited dependencies. In the next milestone of `Skunk`, we intend to enable to mock kernel functions
+Currently, you can test only functions with limited dependencies. In the next milestone of `Skunk`, we intend to enable to mock kernel functions
 so that you can extend your test coverage and flexibility.
 
 ## Architecture
-    .---------------.----------------.
-    | CGI interface | REST interface |
-    |---------------|----------------.
-    | Query command | Update command |
-    |---------------|----------------|
-    |          Shell script          |
-    '--------------------------------'
+![Skunk Architecture](https://github.com/carmeli-tamir/skunk/blob/readme/doc/skunk_arch.png)
+
+Basically, the `skunk.py` library packs the function call in a protobuf message and sends it to `skunk.ko` via an ioctl.
+
+`skunk.ko` then unpacks the message and performs the call within the kernel. 
+
+The return value is returned to user space via another protobuf message.
 
 ## Setup
 
