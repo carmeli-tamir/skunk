@@ -6,12 +6,12 @@
 Current kernel testing solutions either require to write kernel code (for Unit Test solutions such as Kunit and KTF) 
 or perform end to end tests (such as Kselftest, Linux Test Project, Kernel CI, Syzbot).
 
-Since writing kernel code takes time and experience to do well, `Skunk` facilitates
+Since writing kernel code takes time and experience, `Skunk` facilitates
 writing unit test (i.e. testing kernel functions) or integration tests (e.g. testing a kernel subsystem or driver)
 by writing python code in user mode.
 
 A simple example of `Skunk`'s usage is testing the kernel implementation of strstr.
-Here's a python code for a simple test:
+Here's a simple test in python:
 
 ```
 sk = Skunk()
@@ -38,5 +38,19 @@ Basically, the `skunk.py` library packs the function call in a protobuf message 
 The return value is returned to user space via another protobuf message.
 
 ## Setup
+### Prerequisites
+Compiled Linux Kernel source code of your target machine.
+
+See the `before_install` section in `.travis.yml` for an example of a specific kernel version.
+
+Or, See a [tutorial](https://www.freecodecamp.org/news/building-and-installing-the-latest-linux-kernel-from-source-6d8df5345980/ "Compile kernel tutorial")  explaining how to compile your kernel version sources.
+
+### Install
+Simply run `repo.sh -i`. This might take some time.
+
+### Run
+Simply run `repo.sh -r`, and then run your python code. For example you can run `examples/examples1.py`
 
 ## Contributing
+There is a list of issues that we need help with. Waiting for your PRs!
+If you want to make a big change, it might be best to consult first on the issue conversation.
