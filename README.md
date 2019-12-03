@@ -29,7 +29,7 @@ Currently, you can test only functions with limited dependencies. In the next mi
 so that you can extend your test coverage and flexibility.
 
 ## Architecture
-![Skunk Architecture](https://github.com/carmeli-tamir/skunk/blob/readme/doc/skunk_arch.png)
+![Skunk Architecture](https://github.com/carmeli-tamir/skunk/blob/master/doc/skunk_arch.png)
 
 Basically, the `skunk.py` library packs the function call in a protobuf message and sends it to `skunk.ko` via an ioctl.
 
