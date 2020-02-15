@@ -31,6 +31,28 @@ u32 function_call_id(Skunk__FunctionCall__ReturnType ret, u8 numOfArguments,
     return id;
 }
 
+static void call_poc_function_4Arg(char *name, Skunk__FunctionCall__ReturnType ret_type,
+                                Skunk__Argument *arg0, Skunk__Argument *arg1, Skunk__Argument *arg2, Skunk__Argument *arg3
+                                , Skunk__ReturnValue *ret){
+    unsigned long func_addr;
+
+    func_addr = kallsyms_lookup_name(name);
+    if (0 == func_addr) {
+        ret->status = SKUNK__RETURN_VALUE__CALL_STATUS__FunctionDoesntExist;
+    }
+
+    switch (function_call_id(ret_type, 4, arg0->type, arg1->type, arg2->type, arg3->type, 0, 0, 0))
+    {
+    case 0x2110000:
+        ret->four_byte = (typeof(ret->four_byte))((ptrRetfour_byte_stringArgeight_byteArgeight_byteArgfour_byteArg)func_addr)(arg0->arg_string, arg1->arg_eight_byte, arg2->arg_eight_byte, arg3->arg_four_byte);
+        ret->has_four_byte = 1;
+        pr_info("Ret value is %d", ret->four_byte);
+        break;
+    default:
+        break;
+    }
+}
+
 long parse_user_buffer_and_call_function(char *buffer, u32 *length)
 {
     Skunk__FunctionCall *func_call;
@@ -49,9 +71,13 @@ long parse_user_buffer_and_call_function(char *buffer, u32 *length)
     {
         case 1:
             call_function_1Arg(func_call->name, func_call->returntype, func_call->arg1, &skunk_ret);
-        break;
+            break;
         case 2:
             call_function_2Arg(func_call->name, func_call->returntype, func_call->arg1, func_call->arg2, &skunk_ret);
+            break;
+        case 4:
+            call_poc_function_4Arg(func_call->name, func_call->returntype,
+             func_call->arg1, func_call->arg2, func_call->arg3, func_call->arg4, &skunk_ret);
         break;
     default:
         break;

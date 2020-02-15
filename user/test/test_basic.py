@@ -56,7 +56,7 @@ class TestCalls(unittest.TestCase):
         ioctl_ret = self.build_return_value(skunk_pb2.ReturnValue.Success, 0x1ee7, None)
         mock_requests.ioctl.return_value = ioctl_ret
 
-        ret = TestCalls.skunk.call_function_two_arg(
+        ret = TestCalls.skunk.call_function(
             "kallsyms_lookup_name",
             1,
             skunk_pb2.FunctionCall.eight_byte,
@@ -76,7 +76,7 @@ class TestCalls(unittest.TestCase):
         ioctl_ret = self.build_return_value(skunk_pb2.ReturnValue.Success, 133713371500, None)
         mock_requests.ioctl.return_value = ioctl_ret
 
-        ret = TestCalls.skunk.call_function_two_arg(
+        ret = TestCalls.skunk.call_function(
             "round_jiffies",
             1,
             skunk_pb2.FunctionCall.eight_byte,
@@ -96,7 +96,7 @@ class TestCalls(unittest.TestCase):
         ioctl_ret = self.build_return_value(skunk_pb2.ReturnValue.Success, None, "ningoflife")
         mock_requests.ioctl.return_value = ioctl_ret
 
-        ret = TestCalls.skunk.call_function_two_arg(
+        ret = TestCalls.skunk.call_function(
             "strstr",
             2,
             skunk_pb2.FunctionCall.string,

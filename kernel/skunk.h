@@ -10,21 +10,53 @@
 // One arg
 typedef u64 (*ptrReteight_byte_stringArg)(char *arg1);
 typedef u64 (*ptrReteight_byte_eight_byteArg)(u64 arg1);
+typedef u64 (*ptrReteight_byte_four_byteArg)(u32 arg1);
 
 typedef char* (*ptrRetstring_stringArg)(char *arg1);
 typedef char* (*ptrRetstring_eight_byteArg)(u64 arg1);
+typedef char* (*ptrRetstring_four_byteArg)(u32 arg1);
+
+typedef u32 (*ptrRetfour_byte_stringArg)(char *arg1);
+typedef u32 (*ptrRetfour_byte_eight_byteArg)(u64 arg1);
+typedef u32 (*ptrRetfour_byte_four_byteArg)(u32 arg1);
 
 // Two args
+
+typedef u64 (*ptrReteight_byte_four_byteArgfour_byteArg)(u32 arg1, u32 arg2);
+typedef u64 (*ptrReteight_byte_four_byteArgeight_byteArg)(u32 arg1, u64 arg2);
+typedef u64 (*ptrReteight_byte_four_byteArgstringArg)(u32 arg1, char * arg2);
+typedef u64 (*ptrReteight_byte_eight_byteArgfour_byteArg)(u64 arg1, u32 arg2);
+typedef u64 (*ptrReteight_byte_stringArgfour_byteArg)(char * arg1,u32 arg2);
 typedef u64 (*ptrReteight_byte_eight_byteArgeight_byteArg)(u64 arg1, u64 arg2);
 typedef u64 (*ptrReteight_byte_eight_byteArgstringArg)(u64 arg1, char *arg2);
 typedef u64 (*ptrReteight_byte_stringArgeight_byteArg)(char *arg1, u64 arg2);
 typedef u64 (*ptrReteight_byte_stringArgstringArg)(char *arg1, char *arg2);
 
+
+typedef char* (*ptrRetstring_four_byteArgfour_byteArg)(u32 arg1, u32 arg2);
+typedef char* (*ptrRetstring_four_byteArgeight_byteArg)(u32 arg1, u64 arg2);
+typedef char* (*ptrRetstring_four_byteArgstringArg)(u32 arg1, char * arg2);
+typedef char* (*ptrRetstring_eight_byteArgfour_byteArg)(u64 arg1, u32 arg2);
 typedef char* (*ptrRetstring_eight_byteArgeight_byteArg)(u64 arg1, u64 arg2);
 typedef char* (*ptrRetstring_eight_byteArgstringArg)(u64 arg1, char *arg2);
 typedef char* (*ptrRetstring_stringArgeight_byteArg)(char *arg1, u64 arg2);
 typedef char* (*ptrRetstring_stringArgstringArg)(char *arg1, char *arg2);
+typedef char* (*ptrRetstring_stringArgfour_byteArg)(char *arg1, u32 arg2);
 
+
+typedef u32 (*ptrRetfour_byte_four_byteArgfour_byteArg)(u32 arg1, u32 arg2);
+typedef u32 (*ptrRetfour_byte_four_byteArgeight_byteArg)(u32 arg1, u64 arg2);
+typedef u32 (*ptrRetfour_byte_four_byteArgstringArg)(u32 arg1, char * arg2);
+typedef u32 (*ptrRetfour_byte_eight_byteArgfour_byteArg)(u64 arg1, u32 arg2);
+typedef u32 (*ptrRetfour_byte_stringArgfour_byteArg)(char * arg1,u32 arg2);
+typedef u32 (*ptrRetfour_byte_eight_byteArgeight_byteArg)(u64 arg1, u64 arg2);
+typedef u32 (*ptrRetfour_byte_eight_byteArgstringArg)(u64 arg1, char *arg2);
+typedef u32 (*ptrRetfour_byte_stringArgeight_byteArg)(char *arg1, u64 arg2);
+typedef u32 (*ptrRetfour_byte_stringArgstringArg)(char *arg1, char *arg2);
+
+// Four args
+
+typedef u32 (*ptrRetfour_byte_stringArgeight_byteArgeight_byteArgfour_byteArg)(char *arg1, u64 arg2, u64 arg3, u32 arg4);
 
 u32 function_call_id(Skunk__FunctionCall__ReturnType ret, u8 numOfArguments,
                      Skunk__Argument__ArgumentType arg1, Skunk__Argument__ArgumentType arg2,

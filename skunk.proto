@@ -4,14 +4,16 @@ package skunk;
 
 message Argument {
    enum ArgumentType {
-    eight_byte = 0;
-    string = 1;
+    four_byte = 0;
+    eight_byte = 1;
+    string = 2;
   }
 
   required ArgumentType type = 1;
 
-  optional int64 arg_eight_byte = 2;
-  optional string arg_string = 3;
+  optional int32 arg_four_byte = 2;
+  optional int64 arg_eight_byte = 3;
+  optional string arg_string = 4;
 }
 
 message ReturnValue {
@@ -21,15 +23,17 @@ message ReturnValue {
     BadProtobufMessage = 2;
   }
     required CallStatus status = 1;
-    optional int64 eight_byte = 2;
-    optional string string = 3;
-    required bool has_string = 4; // Required since protobuf-c doesn't auto generate this field for pointers :(
+    optional int32 four_byte = 2;
+    optional int64 eight_byte = 3;
+    optional string string = 4;
+    required bool has_string = 5; // Required since protobuf-c doesn't auto generate this field for pointers :(
 }
 
 message FunctionCall {
     enum ReturnType {
-      eight_byte = 0;
-      string = 1;
+      four_byte = 0;
+      eight_byte = 1;
+      string = 2;
     }
     required ReturnType returnType = 1;
 
@@ -37,4 +41,6 @@ message FunctionCall {
     required uint32 numberOfArguments = 3;
     optional Argument arg1 = 4;
     optional Argument arg2 = 5;
+    optional Argument arg3 = 6;
+    optional Argument arg4 = 7;
 }

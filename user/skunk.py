@@ -9,17 +9,23 @@ class Skunk(object):
         self.device_name = device_name
         self.ioctl_num = ioctl_num
 
-    def call_function_two_arg(self, fname, num_args, fret, arg1, type1, arg2=None, type2=None):
-        func_with_one_arg = skunk_pb2.FunctionCall()
-        func_with_one_arg.returnType = fret
-        func_with_one_arg.numberOfArguments = num_args
-        func_with_one_arg.name = fname
-        self._assign_arg(func_with_one_arg.arg1, type1, arg1)
+    def call_function(self, fname, num_args, fret, arg1, type1, arg2=None, type2=None, arg3=None, type3=None, arg4=None, type4=None):
+        func_call = skunk_pb2.FunctionCall()
+        func_call.returnType = fret
+        func_call.numberOfArguments = num_args
+        func_call.name = fname
+        self._assign_arg(func_call.arg1, type1, arg1)
         
         if arg2 is not None and type2 is not None:
-            self._assign_arg(func_with_one_arg.arg2, type2, arg2)
+            self._assign_arg(func_call.arg2, type2, arg2)
 
-        func_with_one_arg_binary = self._binary_length_and_value(func_with_one_arg.SerializeToString(), func_with_one_arg.ByteSize())
+        if arg3 is not None and type3 is not None:
+            self._assign_arg(func_call.arg3, type3, arg3)
+
+        if arg4 is not None and type4 is not None:
+            self._assign_arg(func_call.arg4, type4, arg4)
+
+        func_with_one_arg_binary = self._binary_length_and_value(func_call.SerializeToString(), func_call.ByteSize())
         
         with open(self.device_name, 'r') as skunk_device:
             call_result = fcntl.ioctl(skunk_device, self.ioctl_num, func_with_one_arg_binary)
@@ -39,6 +45,8 @@ class Skunk(object):
             protobuf_arg.arg_string = arg_value
         elif arg_type == skunk_pb2.Argument.eight_byte:
             protobuf_arg.arg_eight_byte = arg_value
+        elif arg_type == skunk_pb2.Argument.four_byte:
+            protobuf_arg.arg_four_byte = arg_value
         else:
             raise ValueError("Unsupported argument type")
     
