@@ -3,6 +3,8 @@
 #include <linux/errno.h>
 #include <linux/kallsyms.h>
 
+#include <linux/ftrace.h>
+
 #include "skunk.pb-c.h"
 
 u32 function_call_id(Skunk__FunctionCall__ReturnType ret, u8 numOfArguments,
@@ -53,6 +55,77 @@ static void call_poc_function_4Arg(char *name, Skunk__FunctionCall__ReturnType r
     }
 }
 
+int fake_call_usermodehelper_exec(void* bla, int w)
+{
+	return 0;
+}
+
+void* fake_kmem_cache_alloc_trace(void * a, unsigned b, size_t c)
+{
+	return NULL;
+}
+
+void
+function_test_events_call(unsigned long ip, unsigned long parent_ip,
+			  struct ftrace_ops *op, struct pt_regs *pt_regs)
+{   
+    // On X86_64, CALLER_ADDR2 is next to ip, CALLER_ADDR3 == parent_ip 
+    // CALLER_ADDR4 is therefore the grandparent_ip, which is the call Skunk makes.
+    // Hence, here we make sure that we mock the function only when mocked by Skunk.
+    // The caller number may be different on other architectures / kernel compile flags.
+    #ifdef CONFIG_X86_64 
+    unsigned long grandparent_ip = CALLER_ADDR4;
+    if (!within_module(grandparent_ip, THIS_MODULE)) {
+        return;
+    }
+    #endif //CONFIG_X86_64
+
+
+    if (pt_regs) {
+        if (ip == kallsyms_lookup_name("call_usermodehelper_exec")) {
+                pt_regs->ip = (unsigned long)fake_call_usermodehelper_exec;
+                pr_info("Skunk mocking call_usermodehelper_exec on ip %lu and parent ip %lu", ip, parent_ip);
+        } else if (ip == kallsyms_lookup_name("kmem_cache_alloc_trace")) {
+                pt_regs->ip = (unsigned long)fake_kmem_cache_alloc_trace;
+                pr_info("Skunk mocking kmem_cache_alloc_trace on ip %lu and parent ip %lu", ip, parent_ip);
+        }
+        else {
+                pr_info("Couldn't find the right mock");
+        }
+    }
+}
+
+static struct ftrace_ops trace_ops =
+{
+	.func = function_test_events_call,
+	.flags = FTRACE_OPS_FL_IPMODIFY | FTRACE_OPS_FL_SAVE_REGS,
+};
+
+
+static void set_trace(void)
+{
+    int ret = ftrace_set_filter_ip(&trace_ops, kallsyms_lookup_name("call_usermodehelper_exec"), 0, 0);
+    ret = ftrace_set_filter_ip(&trace_ops, kallsyms_lookup_name("kmem_cache_alloc_trace"), 0, 0);
+    if (ret) {
+            pr_info("ftrace_set_filter_ip() failed: %d\n", ret);
+            return;
+    }
+    ret = register_ftrace_function(&trace_ops);
+	if (WARN_ON(ret < 0)) {
+		pr_info("Failed to enable function tracer for event tests %d\n", ret);
+		return;
+	}
+    pr_info("success set trace");
+}
+
+static void remove_trace(void)
+{
+    unregister_ftrace_function(&trace_ops);
+    ftrace_set_filter_ip(&trace_ops, kallsyms_lookup_name("kmem_cache_alloc_trace"), 1, 0);
+    ftrace_set_filter_ip(&trace_ops, kallsyms_lookup_name("call_usermodehelper_exec"), 1, 0);
+}
+
+
 long parse_user_buffer_and_call_function(char *buffer, u32 *length)
 {
     Skunk__FunctionCall *func_call;
@@ -66,6 +139,8 @@ long parse_user_buffer_and_call_function(char *buffer, u32 *length)
     }
 
     skunk__return_value__init(&skunk_ret);
+
+    set_trace();
 
     switch (func_call->numberofarguments)
     {
@@ -82,6 +157,9 @@ long parse_user_buffer_and_call_function(char *buffer, u32 *length)
     default:
         break;
     }
+
+    remove_trace();
+
     // Return must be packed before freeing func_call, since a memory in ret can point to arguments in func_call.
     ret_message_size = skunk__return_value__get_packed_size(&skunk_ret);
     if (ret_message_size > *length) {
