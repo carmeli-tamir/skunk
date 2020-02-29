@@ -36,6 +36,10 @@ class Skunk(object):
         return_value = skunk_pb2.ReturnValue()
         return_value.ParseFromString(call_result[length_of_size_field:length_of_size_field + return_length])
 
+        if (return_value.status != skunk_pb2.ReturnValue.Success):
+            error_string = skunk_pb2.ReturnValue.CallStatus.keys()[return_value.status]
+            raise RuntimeError(f"Unable to perform function call due to error {error_string}")
+
         return return_value
 
     @staticmethod
