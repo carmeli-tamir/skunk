@@ -21,6 +21,7 @@ message ReturnValue {
     Success = 0;
     FunctionDoesntExist = 1;
     BadProtobufMessage = 2;
+    MockingError = 3;
   }
     required CallStatus status = 1;
     optional int32 four_byte = 2;

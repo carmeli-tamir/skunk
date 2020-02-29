@@ -2,7 +2,6 @@
 #include <linux/init.h>       /* Needed for the macros */
 #include <linux/miscdevice.h>
 
-
 MODULE_LICENSE("GPL");
  
 MODULE_AUTHOR("carmeli.tamir@gmail.com");

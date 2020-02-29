@@ -1,9 +1,9 @@
 #include "skunk.h"
+#include "skunk.pb-c.h"
+#include "mock.h"
 
 #include <linux/errno.h>
 #include <linux/kallsyms.h>
-
-#include "skunk.pb-c.h"
 
 u32 function_call_id(Skunk__FunctionCall__ReturnType ret, u8 numOfArguments,
                      Skunk__Argument__ArgumentType arg1, Skunk__Argument__ArgumentType arg2,
@@ -39,6 +39,7 @@ static void call_poc_function_4Arg(char *name, Skunk__FunctionCall__ReturnType r
     func_addr = kallsyms_lookup_name(name);
     if (0 == func_addr) {
         ret->status = SKUNK__RETURN_VALUE__CALL_STATUS__FunctionDoesntExist;
+        return;
     }
 
     switch (function_call_id(ret_type, 4, arg0->type, arg1->type, arg2->type, arg3->type, 0, 0, 0))
@@ -58,6 +59,9 @@ long parse_user_buffer_and_call_function(char *buffer, u32 *length)
     Skunk__FunctionCall *func_call;
     Skunk__ReturnValue skunk_ret;
     u32 ret_message_size;
+    struct mock * mock;
+    const char *names[] = {"call_usermodehelper_exec", "kmem_cache_alloc_trace"};
+    unsigned long return_vals[] = {0, 0};
     long ret = 0;
 
     func_call = skunk__function_call__unpack(NULL, *length, buffer);
@@ -66,6 +70,12 @@ long parse_user_buffer_and_call_function(char *buffer, u32 *length)
     }
 
     skunk__return_value__init(&skunk_ret);
+
+    mock = init_mock(names, return_vals, sizeof(names) / sizeof(names[0]));
+    if (start_mocking(mock)) {
+        skunk_ret.status = SKUNK__RETURN_VALUE__CALL_STATUS__MockingError;
+        goto cleanup;
+    }
 
     switch (func_call->numberofarguments)
     {
@@ -82,6 +92,12 @@ long parse_user_buffer_and_call_function(char *buffer, u32 *length)
     default:
         break;
     }
+
+ cleanup:
+    stop_mocking(mock);
+    destroy_mock(mock);
+
+
     // Return must be packed before freeing func_call, since a memory in ret can point to arguments in func_call.
     ret_message_size = skunk__return_value__get_packed_size(&skunk_ret);
     if (ret_message_size > *length) {
