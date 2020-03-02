@@ -1,3 +1,4 @@
+import pytest
 import unittest
 from unittest import mock
 from unittest.mock import patch
@@ -112,3 +113,27 @@ class TestCalls(unittest.TestCase):
                 self.build_function_call(skunk_pb2.FunctionCall.string, "strstr", skunk_pb2.Argument.string,  "whatisthemeaningoflife", skunk_pb2.Argument.string,  "ning")
             )
         assert ret.string == "ningoflife"
+
+    @patch('skunk.fcntl')
+    def test_raise_exception(self, mock_requests):
+        ioctl_ret = self.build_return_value(skunk_pb2.ReturnValue.MockingError, None, "ningoflife")
+        mock_requests.ioctl.return_value = ioctl_ret
+
+        with pytest.raises(RuntimeError) as error:
+            ret = TestCalls.skunk.call_function(
+                    "some_func",
+                    2,
+                    skunk_pb2.FunctionCall.string,
+                    "stringy1",
+                    skunk_pb2.Argument.string,
+                    "stringy2",
+                    skunk_pb2.Argument.string
+                )
+            assert "MockingError" in str(error.value)
+
+
+        mock_requests.ioctl.assert_called_once_with(
+                mock.ANY,
+                mock.ANY, 
+                self.build_function_call(skunk_pb2.FunctionCall.string, "some_func", skunk_pb2.Argument.string,  "stringy1", skunk_pb2.Argument.string,  "stringy2")
+            )
