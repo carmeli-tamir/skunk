@@ -10,6 +10,7 @@ generate_proto()
 install_protoc_kernel_module()
 {
     cd protobuf-c
+    make clean
     make
     cd ..
 }
@@ -86,6 +87,11 @@ pip_install()
     sudo $res install -e user
 }
 
+init_submodules()
+{
+    git submodule update --init
+}
+
 usage()
 {
     echo "usage: $0 [[[-i|--install] [-r|--run]] | [-h|--help]]"
@@ -93,11 +99,13 @@ usage()
 
 install()
 {
+    init_submodules
     pip_install
     install_protobuf
     install_protoc
     generate_proto
     make_skunk
+    pip_install
 }
 
 run()

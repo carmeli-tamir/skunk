@@ -41,6 +41,12 @@ The return value is returned to user space via another protobuf message.
 ### Prerequisites
 Compiled Linux Kernel source code of your target machine.
 
+Install the following packages:
+
+'''
+sudo apt install -y linux-source python3 python3-pip autoconf libtool pkg-config
+'''
+
 See the `before_install` section in `.travis.yml` for an example of a specific kernel version.
 
 Or, See a [tutorial](https://www.freecodecamp.org/news/building-and-installing-the-latest-linux-kernel-from-source-6d8df5345980/ "Compile kernel tutorial")  explaining how to compile your kernel version sources.

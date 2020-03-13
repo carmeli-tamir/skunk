@@ -8,7 +8,7 @@ EXTRA_CFLAGS=-I $(PWD)/../third_party/protobuf-c/
 KDIR?=/lib/modules/$(shell uname -r)/build
 
 all:
-	python generate_function_calls.py
+	python3 generate_function_calls.py
 	make -C $(KDIR) M=$(PWD) modules
 
 clean:
