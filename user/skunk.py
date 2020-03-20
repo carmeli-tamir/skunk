@@ -8,8 +8,8 @@ from ioctl_opt import IOWR, IOW
 import skunk_pb2
 
 class Skunk(object):
-    def __init__(self):
-        self.device_name = "/dev/skunk"
+    def __init__(self, device_name="/dev/skunk"):
+        self.device_name = device_name
         self.func_call_ioctl_num = IOWR(0xEE, 0 ,ctypes.c_char_p)
         self.mock_create_ioctl_num = IOW(0xEE, 1 ,ctypes.c_char_p)
 
