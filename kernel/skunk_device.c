@@ -57,7 +57,10 @@ static long cmd_call_function(unsigned long arg)
 
 static long cmd_set_mock(unsigned long arg)
 {
+    Skunk__MockSetup mock_setup;
     pr_info("OMG set mock");
+    // TODO: Where to manage the mock object? ( Design question)
+    skunk__mock_setup__init(&mock_setup);
     return 0;
 }
 
