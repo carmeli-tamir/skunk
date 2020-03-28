@@ -45,3 +45,12 @@ message FunctionCall {
     optional Argument arg3 = 6;
     optional Argument arg4 = 7;
 }
+
+message FunctionMock {
+  required string name = 1;
+  required int64 eight_byte = 2;
+}
+
+message MockSetup {
+  repeated FunctionMock function_mocks = 1;
+}

@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
+import ctypes
+from contextlib import contextmanager
 import fcntl
 import struct
-import ctypes
+
 
 from ioctl_opt import IOWR, IOW
 
@@ -46,9 +48,27 @@ class Skunk(object):
 
         return return_value
 
-    def create_mock(self):
+    def add_mock(self, fname, fret):
+        """
+        Adds a mock to be later used by apply_mock method.
+        """
+        #TODO: Define the mock message in protobuf, only then decide how to implement this.
+        pass
+
+    """
+        Applies the mocks added by add_mock method in the inner context.
+        After the context finishes, the mocks don't apply and are also deleted,
+        i.e. no mock will apply in a subsuquent invocation unless added again by add_mock.
+    """
+    @contextmanager
+    def apply_mock(self):
         with open(self.device_name, 'r') as skunk_device:
             fcntl.ioctl(skunk_device, self.mock_create_ioctl_num, b"")
+        try:
+            yield
+        finally:
+            print("ended mock")
+
 
     @staticmethod
     def _assign_arg(protobuf_arg, arg_type, arg_value):
