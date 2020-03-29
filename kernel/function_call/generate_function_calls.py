@@ -5,7 +5,7 @@ import itertools
 
 import skunk_pb2
 
-OUTPUT_FILE = "function_calls.c"
+OUTPUT_FILE = "function_call/function_calls.c"
 MAX_ARGUMENTS = 7
 
 FUNCTION_CALL_TEMPLATE = """
