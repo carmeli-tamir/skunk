@@ -29,7 +29,7 @@ struct mock * init_mock(char const **function_names, unsigned long *return_value
     
     if (NULL == res) {
         pr_warn("init_mock failed allocating memory");
-        return res;
+        return ERR_PTR(-ENOMEM);
     }
 
     INIT_LIST_HEAD(&(res->mock_list));
@@ -39,12 +39,14 @@ struct mock * init_mock(char const **function_names, unsigned long *return_value
         if (NULL == pair) {
             pr_warn("init_mock failed allocating memory");
             destroy_mock(res);
+            return ERR_PTR(-ENOMEM);
         }
         pair->original = kallsyms_lookup_name(function_names[i]);
         if (0 == pair->original) {
             pr_warn("init_mock couldn't find the function '%s'", function_names[i]);
             vfree(pair);
             destroy_mock(res);
+            return ERR_PTR(-EINVAL);
         }
         pair->ret = return_values[i];
         list_add(&(pair->list), &(res->mock_list));
@@ -101,7 +103,7 @@ static struct ftrace_ops trace_ops =
 	.flags = FTRACE_OPS_FL_IPMODIFY | FTRACE_OPS_FL_SAVE_REGS,
 };
 
-int start_mocking(struct mock const *mock) 
+int start_mock(struct mock const *mock) 
 {   
     struct mock_pair *pos;
     int ret;
@@ -123,7 +125,7 @@ int start_mocking(struct mock const *mock)
     return ret;
 }
 
-void stop_mocking(struct mock const *mock)
+void stop_mock(struct mock const *mock)
 {
     struct mock_pair *pos;
     unregister_ftrace_function(&trace_ops);
