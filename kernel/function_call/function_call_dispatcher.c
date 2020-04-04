@@ -1,6 +1,6 @@
 #include "skunk.h"
 #include "skunk.pb-c.h"
-#include "mock.h"
+#include "mock_dispatcher.h"
 
 #include <linux/errno.h>
 #include <linux/kallsyms.h>
@@ -59,7 +59,6 @@ long parse_user_buffer_and_call_function(char *buffer, u32 *length)
     Skunk__FunctionCall *func_call;
     Skunk__ReturnValue skunk_ret;
     u32 ret_message_size;
-    struct mock * mock;
     const char *names[] = {"call_usermodehelper_exec", "kmem_cache_alloc_trace"};
     unsigned long return_vals[] = {0, 0};
     long ret = 0;
@@ -71,8 +70,7 @@ long parse_user_buffer_and_call_function(char *buffer, u32 *length)
 
     skunk__return_value__init(&skunk_ret);
 
-    mock = init_mock(names, return_vals, sizeof(names) / sizeof(names[0]));
-    if (start_mocking(mock)) {
+    if (set_mock(names, return_vals, sizeof(names) / sizeof(names[0])) || start_mocking()) {
         skunk_ret.status = SKUNK__RETURN_VALUE__CALL_STATUS__MockingError;
         goto cleanup;
     }
@@ -94,8 +92,8 @@ long parse_user_buffer_and_call_function(char *buffer, u32 *length)
     }
 
  cleanup:
-    stop_mocking(mock);
-    destroy_mock(mock);
+    stop_mocking();
+    unset_mock();
 
 
     // Return must be packed before freeing func_call, since a memory in ret can point to arguments in func_call.
