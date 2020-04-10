@@ -6,6 +6,7 @@
 
 #include "skunk.h"
 #include "interface.h"
+#include "mock_dispatcher.h"
 
 static int open_skunk_device(struct inode *inodep, struct file *filep)
 {
@@ -51,8 +52,7 @@ static long copy_message_to_user(unsigned long arg, char* message, u32 message_s
     return 0;
 }
 
-
-static long cmd_call_function(unsigned long arg)
+static long copy_user_message_and_call(unsigned long arg, long (*parse_and_operate)(char *, u32 *))
 {
     long ret = 0;
     u32 message_size;
@@ -62,7 +62,7 @@ static long cmd_call_function(unsigned long arg)
     if (0 > message_size) {
         return message_size;
     }
-    ret = parse_user_buffer_and_call_function(message, &message_size);
+    ret = parse_and_operate(message, &message_size);
 
     if (0 == ret) {
         ret = copy_message_to_user(arg, message, message_size);
@@ -75,25 +75,16 @@ static long cmd_call_function(unsigned long arg)
     return ret;
 }
 
-static long cmd_set_mock(unsigned long arg)
-{
-    Skunk__MockSetup mock_setup;
-    pr_info("OMG set mock");
-    
-    skunk__mock_setup__init(&mock_setup);
-    return 0;
-}
-
 static long ioctl_skunk_device(struct file *file, unsigned int cmd, unsigned long arg)
 {
     long ret;
 
     switch (cmd) {
     case CALL_FUNCTION:
-        ret = cmd_call_function(arg);
+        ret = copy_user_message_and_call(arg, parse_user_buffer_and_call_function);
         break;
     case SET_MOCK:
-        ret = cmd_set_mock(arg);
+        ret = copy_user_message_and_call(arg, parse_message_and_set_mock);
         break;
     default:
         ret = -EINVAL;

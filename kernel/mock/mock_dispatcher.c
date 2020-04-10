@@ -1,10 +1,21 @@
 #include "mock_dispatcher.h"
 #include "mock.h"
 
+#include "skunk.pb-c.h"
+
 #include <linux/errno.h>
 #include <linux/err.h>
 
 static struct mock * mock = NULL;
+
+long parse_message_and_set_mock(char *buffer, u32 *length)
+{
+    Skunk__MockSetup mock_setup;
+    pr_info("OMG set mock");
+
+    skunk__mock_setup__init(&mock_setup);
+    return 0;
+}
 
 int set_mock(char const **function_names, unsigned long *return_values, size_t n)
 {
