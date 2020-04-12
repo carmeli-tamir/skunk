@@ -59,8 +59,6 @@ long parse_user_buffer_and_call_function(char *buffer, u32 *length)
     Skunk__FunctionCall *func_call;
     Skunk__ReturnValue skunk_ret;
     u32 ret_message_size;
-    const char *names[] = {"call_usermodehelper_exec", "kmem_cache_alloc_trace"};
-    unsigned long return_vals[] = {0, 0};
     long ret = 0;
 
     func_call = skunk__function_call__unpack(NULL, *length, buffer);
@@ -70,7 +68,7 @@ long parse_user_buffer_and_call_function(char *buffer, u32 *length)
 
     skunk__return_value__init(&skunk_ret);
 
-    if (set_mock(names, return_vals, sizeof(names) / sizeof(names[0])) || start_mocking()) {
+    if (start_mocking() < 0) {
         skunk_ret.status = SKUNK__RETURN_VALUE__CALL_STATUS__MockingError;
         goto cleanup;
     }

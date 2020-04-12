@@ -14,6 +14,7 @@ class Skunk(object):
         self.device_name = device_name
         self.func_call_ioctl_num = IOWR(0xEE, 0 ,ctypes.c_char_p)
         self.mock_create_ioctl_num = IOW(0xEE, 1 ,ctypes.c_char_p)
+        self.mock_return_values = skunk_pb2.ReturnValueMock()
 
     def call_function(self, fname, num_args, fret, arg1, type1, arg2=None, type2=None, arg3=None, type3=None, arg4=None, type4=None):
         func_call = skunk_pb2.FunctionCall()
@@ -52,22 +53,27 @@ class Skunk(object):
         """
         Adds a mock to be later used by apply_mock method.
         """
-        #TODO: Define the mock message in protobuf, only then decide how to implement this.
-        pass
+        self.mock_return_values.eight_byte_ret.append(fret)
+        self.mock_return_values.function_names.append(fname)
 
-    """
+    @contextmanager
+    def apply_mock(self):
+        """
         Applies the mocks added by add_mock method in the inner context.
         After the context finishes, the mocks don't apply and are also deleted,
         i.e. no mock will apply in a subsuquent invocation unless added again by add_mock.
-    """
-    @contextmanager
-    def apply_mock(self):
+        """
         with open(self.device_name, 'r') as skunk_device:
-            fcntl.ioctl(skunk_device, self.mock_create_ioctl_num, b"")
+            mock_binary = self._binary_length_and_value(
+                    self.mock_return_values.SerializeToString(),
+                    self.mock_return_values.ByteSize()
+                )
+            fcntl.ioctl(skunk_device, self.mock_create_ioctl_num, mock_binary)
         try:
             yield
         finally:
-            print("ended mock")
+            self.mock_return_values.Clear()
+
 
 
     @staticmethod

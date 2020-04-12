@@ -62,6 +62,11 @@ static long copy_user_message_and_call(unsigned long arg, long (*parse_and_opera
     if (0 > message_size) {
         return message_size;
     }
+
+    if (0 == message_size) {
+        return - EINVAL;
+    }
+
     ret = parse_and_operate(message, &message_size);
 
     if (0 == ret) {

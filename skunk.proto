@@ -46,11 +46,7 @@ message FunctionCall {
     optional Argument arg4 = 7;
 }
 
-message FunctionMock {
-  required string name = 1;
-  required int64 eight_byte = 2;
-}
-
-message MockSetup {
-  repeated FunctionMock function_mocks = 1;
+message ReturnValueMock {
+  repeated string function_names = 1;
+  repeated int64 eight_byte_ret = 2;
 }
