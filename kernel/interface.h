@@ -5,4 +5,6 @@
 
 #define SET_MOCK _IOW(0xEE, 1, char *)
 
+#define UNSET_MOCK _IO(0xEE, 2)
+
 #endif // _INTERFACE_H

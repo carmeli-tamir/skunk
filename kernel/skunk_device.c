@@ -91,6 +91,9 @@ static long ioctl_skunk_device(struct file *file, unsigned int cmd, unsigned lon
     case SET_MOCK:
         ret = copy_user_message_and_call(arg, parse_message_and_set_mock);
         break;
+    case UNSET_MOCK:
+        ret = unset_mock();
+        break;
     default:
         ret = -EINVAL;
     }
