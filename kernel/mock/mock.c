@@ -20,13 +20,59 @@ struct mock {
     struct list_head mock_list;
 };
 
+static inline void override_return_value(struct pt_regs *pt_regs, unsigned long value) {
+     #ifdef CONFIG_X86
+     typedef void (*override_return_type) (struct pt_regs *regs);
+     override_return_type override_return = (override_return_type) kallsyms_lookup_name("override_function_with_return");
+     regs_set_return_value(pt_regs, value);
+     override_return(pt_regs);
+     #elif defined(CONFIG_ARM)
+     // TODO
+     #endif
+}
 
-struct mock * init_mock(char const **function_names, unsigned long *return_values, size_t n) 
+void
+ftrace_callback(unsigned long ip, unsigned long parent_ip,
+			  struct ftrace_ops *op, struct pt_regs *pt_regs)
+{   
+    struct mock_pair *pos;
+    // On X86_64, CALLER_ADDR2 is next to ip, CALLER_ADDR3 == parent_ip 
+    // CALLER_ADDR4 is therefore the grandparent_ip, which is the call Skunk makes.
+    // Hence, here we make sure that we mock the function only when mocked by Skunk.
+    // The caller number may be different on other architectures / kernel compile flags.
+    #ifdef CONFIG_X86_64 
+    unsigned long grandparent_ip = CALLER_ADDR4;
+    if (!within_module(grandparent_ip, THIS_MODULE)) {
+        pr_info("Called function not within Skunk module");
+        return;
+    }
+    #endif //CONFIG_X86_64
+
+    if (pt_regs) {
+
+        list_for_each_entry(pos, (struct list_head*)op->private, list) {
+            if (pos->original == ip) {
+                override_return_value(pt_regs, pos->ret);
+                pr_info("Skunk mocking ip %lu with ret value %lu", ip, pos->ret);
+                return;
+            }
+        }
+        pr_info("Couldn't find requested mock on ip %lu", ip);
+    }
+}
+
+static struct ftrace_ops trace_ops =
+{
+	.func = ftrace_callback,
+	.flags = FTRACE_OPS_FL_IPMODIFY | FTRACE_OPS_FL_SAVE_REGS,
+};
+
+struct mock * init_mock(char const **function_names, unsigned long *return_values, size_t n)
 {
     int i = 0;
     struct mock_pair *pair;
     struct mock * res = vzalloc(sizeof(*res));
-    
+
     if (NULL == res) {
         pr_warn("init_mock failed allocating memory");
         return ERR_PTR(-ENOMEM);
@@ -51,57 +97,11 @@ struct mock * init_mock(char const **function_names, unsigned long *return_value
         pair->ret = return_values[i];
         list_add(&(pair->list), &(res->mock_list));
     }
+
+    trace_ops.private = &(res->mock_list);
+
     return res;
 }
-
-
-static inline void override_return_value(struct pt_regs *pt_regs, unsigned long value) {
-     #ifdef CONFIG_X86
-     typedef void (*override_return_type) (struct pt_regs *regs);
-     override_return_type override_return = (override_return_type) kallsyms_lookup_name("override_function_with_return");
-     regs_set_return_value(pt_regs, value);
-     override_return(pt_regs);
-     #elif defined(CONFIG_ARM)
-     // TODO
-     #endif
-}
-
-void
-ftrace_callback(unsigned long ip, unsigned long parent_ip,
-			  struct ftrace_ops *op, struct pt_regs *pt_regs)
-{   
-    // On X86_64, CALLER_ADDR2 is next to ip, CALLER_ADDR3 == parent_ip 
-    // CALLER_ADDR4 is therefore the grandparent_ip, which is the call Skunk makes.
-    // Hence, here we make sure that we mock the function only when mocked by Skunk.
-    // The caller number may be different on other architectures / kernel compile flags.
-    #ifdef CONFIG_X86_64 
-    unsigned long grandparent_ip = CALLER_ADDR4;
-    if (!within_module(grandparent_ip, THIS_MODULE)) {
-        pr_info("Called function not within Skunk module");
-        return;
-    }
-    #endif //CONFIG_X86_64
-
-
-    if (pt_regs) {
-        if (ip == kallsyms_lookup_name("call_usermodehelper_exec")) {
-                override_return_value(pt_regs, 0);
-                pr_info("Skunk mocking call_usermodehelper_exec on ip %lu and parent ip %lu", ip, parent_ip);
-        } else if (ip == kallsyms_lookup_name("kmem_cache_alloc_trace")) {
-                override_return_value(pt_regs, 0);
-                pr_info("Skunk mocking kmem_cache_alloc_trace on ip %lu and parent ip %lu", ip, parent_ip);
-        }
-        else {
-                pr_info("Couldn't find the right mock");
-        }
-    }
-}
-
-static struct ftrace_ops trace_ops =
-{
-	.func = ftrace_callback,
-	.flags = FTRACE_OPS_FL_IPMODIFY | FTRACE_OPS_FL_SAVE_REGS,
-};
 
 int start_mock(struct mock const *mock) 
 {   
@@ -121,6 +121,7 @@ int start_mock(struct mock const *mock)
 		pr_info("Failed to enable function tracer %d\n", ret);
 		return ret;
 	}
+
     pr_info("success set trace");
     return ret;
 }

@@ -91,8 +91,6 @@ long parse_user_buffer_and_call_function(char *buffer, u32 *length)
 
  cleanup:
     stop_mocking();
-    unset_mock();
-
 
     // Return must be packed before freeing func_call, since a memory in ret can point to arguments in func_call.
     ret_message_size = skunk__return_value__get_packed_size(&skunk_ret);
