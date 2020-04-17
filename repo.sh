@@ -114,10 +114,36 @@ run()
     load_skunk_kernel_module
 }
 
+compile_kernel()
+{
+    sudo apt install -y bison flex gcc-arm-linux-gnueabihf qemu-system-arm
+    export LINUX_VERSION="linux-4.19.84"
+    if [ ! -d "$LINUX_VERSION" ]; then
+        wget "https://cdn.kernel.org/pub/linux/kernel/v4.x/$LINUX_VERSION.tar.xz"
+        tar -xJf $LINUX_VERSION.tar.xz
+    fi
+
+    cp `dirname $0`/tests/setup/skunk_defconfig  $LINUX_VERSION/arch/arm/configs
+    cd $LINUX_VERSION
+
+    make ARCH=arm skunk_defconfig
+    make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- -j$(nproc)
+    cd ..
+
+    qemu-system-arm -machine virt -cpu cortex-a15 -m 512 -kernel $LINUX_VERSION/arch/arm/boot/zImage -append 'console=ttyAMA0 earlyprintk=ttyAMA0' --nographic -no-reboot -serial mon:stdio
+}
+
+run_tests()
+{
+    compile_kernel
+    echo "OMG test"
+}
+
 ##### Main
 
 install=
 run=
+test=
 
 if [ $# == 0 ]; then
     usage
@@ -131,6 +157,8 @@ while [ "$1" != "" ]; do
         -r | --run )            run=1
                                 ;;
         -p | --proto )          proto=1
+                                ;;
+        -t | --test )           test=1
                                 ;;
         -h | --help )           usage
                                 exit
@@ -151,4 +179,8 @@ fi
 
 if [ "$proto" = "1" ]; then
     generate_proto
+fi
+
+if [ "$test" = "1" ]; then
+    run_tests
 fi
